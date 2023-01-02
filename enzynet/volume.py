@@ -144,7 +144,7 @@ class VolumeDataGenerator(keras.utils.Sequence):
                                     self.directory_pdb, self.directory_precomputed)
                   counter += 1
                 except:
-                  print('Error code: ': pdb_id) 
+                  print('Error code: ', pdb_id) 
                   
         print("Had to compute files of {0} enzymes.".format(counter))
 
