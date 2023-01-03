@@ -186,38 +186,42 @@ class VolumeDataGenerator(keras.utils.Sequence):
 
         # Computations.
         for i in range(self.batch_size):
-            # Store class.
-            y[i] = self.labels[list_enzymes_temp[i]]
-
-            # Load precomputed coordinates.
-            coords = load_coords(list_enzymes_temp[i], self.p, self.directory_precomputed)
-            coords = coords_center_to_zero(coords)
-            coords = adjust_size(coords, v_size=self.v_size, max_radius=self.max_radius)
-
-            # Get weights.
-            local_weights = []
-            for weight in self.weights:
-                local_weight = load_weights(list_enzymes_temp[i], weight, self.p, self.scaling_weights,
-                                            self.directory_precomputed)  # Computes extended weights.
-                local_weights += [local_weight]  # Store.
-
-            # PCA.
-            coords = decomposition.PCA(
-                n_components=constants.N_DIMENSIONS).fit_transform(coords)
-
-            # Do flip.
-            coords_temp = flip_around_axis(coords, axis=self.flips)
-
-            if len(self.weights) == 0:
-                # Convert to volume and store.
-                X[i, :, :, :, 0] = coords_to_volume(coords_temp, self.v_size,
-                                                    noise_treatment=self.noise_treatment)
-
+            missing_pdbs = ["4UE3", "4UGF", "4UGS", "3MK8", "4DCB"]
+            if list_enzymes_temp[i] in missing_pdbs:
+              pass
             else:
-                # Compute to weights of volume and store.
-                for k in range(self.n_channels):
-                    X[i, :, :, :, k] = weights_to_volume(coords_temp, local_weights[k],
-                                                         self.v_size, noise_treatment=self.noise_treatment)
+              # Store class.
+              y[i] = self.labels[list_enzymes_temp[i]]
+
+              # Load precomputed coordinates.
+              coords = load_coords(list_enzymes_temp[i], self.p, self.directory_precomputed)
+              coords = coords_center_to_zero(coords)
+              coords = adjust_size(coords, v_size=self.v_size, max_radius=self.max_radius)
+
+              # Get weights.
+              local_weights = []
+              for weight in self.weights:
+                  local_weight = load_weights(list_enzymes_temp[i], weight, self.p, self.scaling_weights,
+                                              self.directory_precomputed)  # Computes extended weights.
+                  local_weights += [local_weight]  # Store.
+
+              # PCA.
+              coords = decomposition.PCA(
+                  n_components=constants.N_DIMENSIONS).fit_transform(coords)
+
+              # Do flip.
+              coords_temp = flip_around_axis(coords, axis=self.flips)
+
+              if len(self.weights) == 0:
+                  # Convert to volume and store.
+                  X[i, :, :, :, 0] = coords_to_volume(coords_temp, self.v_size,
+                                                      noise_treatment=self.noise_treatment)
+
+              else:
+                  # Compute to weights of volume and store.
+                  for k in range(self.n_channels):
+                      X[i, :, :, :, k] = weights_to_volume(coords_temp, local_weights[k],
+                                                           self.v_size, noise_treatment=self.noise_treatment)
 
         return X, sparsify(y)
 
