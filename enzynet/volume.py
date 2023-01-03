@@ -188,7 +188,7 @@ class VolumeDataGenerator(keras.utils.Sequence):
         for i in range(self.batch_size):
             missing_pdbs = ["4UE3", "4UGF", "4UGS", "3MK8", "4DCB"]
             if list_enzymes_temp[i] in missing_pdbs:
-              pass
+              continue
             else:
               # Store class.
               y[i] = self.labels[list_enzymes_temp[i]]
